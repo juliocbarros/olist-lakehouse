@@ -1,0 +1,26 @@
+# O catálogo em si (lakehouse_olist) é criado fora do bundle, por
+# scripts/criar-catalogo.sh — ver o comentário nesse script para o motivo.
+# Aqui vive o resto do catálogo: schemas e o volume de raw.
+
+resources:
+  schemas:
+    bronze:
+      name: bronze
+      catalog_name: ${var.catalog}
+      comment: Camada raw — os 9 CSVs do dataset Olist exatamente como baixados, byte a byte, sem transformação.
+    silver:
+      name: silver
+      catalog_name: ${var.catalog}
+      comment: Camada de dados limpos e conformados, prontos para modelagem analítica.
+    gold:
+      name: gold
+      catalog_name: ${var.catalog}
+      comment: Camada de métricas e agregados de negócio, consumida por dashboards e relatórios.
+
+  volumes:
+    raw:
+      name: raw
+      catalog_name: ${var.catalog}
+      schema_name: bronze
+      volume_type: MANAGED
+      comment: Landing zone dos 9 CSVs de origem do dataset Olist, antes de qualquer tabela bronze existir.
