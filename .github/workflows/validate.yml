@@ -1,0 +1,30 @@
+name: Validar bundle
+
+# Roda em todo PR que mexe no repositório — pega erro de sintaxe/config antes
+# do merge. Não faz deploy, só `databricks bundle validate`.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_HOST: https://dbc-604bc86c-0b09.cloud.databricks.com
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: databricks bundle validate --target dev
+        run: databricks bundle validate --target dev

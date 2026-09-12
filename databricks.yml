@@ -43,7 +43,12 @@ targets:
     mode: production
     workspace:
       host: https://dbc-604bc86c-0b09.cloud.databricks.com
-      root_path: /Workspace/Users/juliobarro@gmail.com/.bundle/${bundle.name}/${bundle.target}
+      # `mode: production` exige um root_path explícito, mas evitamos fixar
+      # um usuário humano aqui: o deploy em prod passa a ser feito sempre
+      # pelo Service Principal do GitHub Actions via CI (ver
+      # .github/workflows/deploy-prod.yml), então usamos quem está
+      # autenticado no momento do deploy — resolve para o SP via OIDC.
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     variables:
       catalog: lakehouse_olist
       warehouse_id: 7c3ea71f9ae30d85

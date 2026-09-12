@@ -1,0 +1,32 @@
+name: Deploy prod
+
+# Só roda quando disparado manualmente (Actions > Deploy prod > Run
+# workflow). O environment "prod" no GitHub deve ter um reviewer
+# obrigatório configurado (Settings > Environments > prod > Required
+# reviewers) — é isso que torna esse deploy "manual" de verdade, não só
+# o gatilho.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_HOST: https://dbc-604bc86c-0b09.cloud.databricks.com
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: databricks bundle deploy --target prod
+        run: databricks bundle deploy --target prod

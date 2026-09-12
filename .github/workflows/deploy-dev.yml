@@ -1,0 +1,31 @@
+name: Deploy dev
+
+# Roda a cada push na main — deploy automático no target dev. Não roda o
+# pipeline (olist_pipeline já tem agendamento próprio diário); só garante
+# que o workspace reflita o que está na main.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      DATABRICKS_AUTH_TYPE: github-oidc
+      DATABRICKS_HOST: https://dbc-604bc86c-0b09.cloud.databricks.com
+      DATABRICKS_CLIENT_ID: ${{ vars.DATABRICKS_CLIENT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: databricks bundle deploy --target dev
+        run: databricks bundle deploy --target dev
